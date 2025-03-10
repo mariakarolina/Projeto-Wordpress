@@ -1,8 +1,6 @@
 # Documentação do Projeto - WordPress na AWS com Docker
 
-## Visão Geral
-
-Este projeto configura um ambiente AWS para o deploy do WordPress usando Docker. O ambiente inclui VPC, subnets, EC2, RDS, EFS e um Classic Load Balancer (CLB). O WordPress é executado em uma instância privada EC2, com acesso ao banco de dados RDS e armazenamento compartilhado via EFS.
+Este projeto tem como objetivo implementar um ambiente WordPress na AWS utilizando serviços gerenciados e escaláveis.
 
 
 ![image](https://github.com/user-attachments/assets/d50b2031-7a44-40b0-8f97-9efc5beba1b7)
