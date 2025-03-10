@@ -85,6 +85,7 @@ Você deve configurar os grupos de segurança para restringir o acesso aos recur
 Crie um **EFS** para armazenar arquivos compartilhados entre instâncias.
 
 6.1  **Crie um EFS:**
+    
     ** No console do EFS, clique em "Create file system".
     ** Selecione a VPC `wordpress-vpc`.
     ** Selecione as subnets privadas.
