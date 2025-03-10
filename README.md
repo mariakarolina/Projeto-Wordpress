@@ -8,7 +8,7 @@ Este projeto configura um ambiente AWS para o deploy do WordPress usando Docker.
 
 ### **1. Virtual Private Cloud (VPC)**
 
-Criação de uma **VPC and more** para isolar os recursos da infraestrutura.
+Você deve criar uma **VPC and more** para isolar os recursos da infraestrutura.
 
 | Configuração | Valor |
 |-------------|-------|
@@ -21,45 +21,26 @@ Criação de uma **VPC and more** para isolar os recursos da infraestrutura.
 
 ### **2. Subnets**
 
-- **Duas subnets públicas** 
-- **Duas subnets privadas** 
+- **Crie duas subnets públicas** 
+- **Crie duas subnets privadas** 
 
 ### **3. Internet Gateway (IGW) e NAT Gateway**
 
-- **IGW**: Permite o acesso à internet para os recursos na subnet pública.
-- **NAT Gateway**: Permite que instâncias privadas tenham acesso à internet para downloads e updates.
+- **Crie um IGW**: Ele permite o acesso à internet para os recursos na subnet pública.
+- **Crie um NAT Gateway**: Ele permite que instâncias privadas tenham acesso à internet para downloads e updates.
 
 ### **4. Security Groups (SGs)**
 
-Criamos grupos de segurança para restringir o acesso aos recursos:
+Você deve configurar os grupos de segurança para restringir o acesso aos recursos:
 
 | Security Group | Regras de Entrada | Regras de Saída |
 |---------------|------------------|----------------|
-| **LB_wp** | HTTP e HTTPS -> Qualquer IPV4 | Qualquer destino |
-| **EC2_wp** | HTTP e HTTPS -> LB_wp <br> SSH -> Qualquer IPV4 (Somente para testes) | Padrão |
-| **RDS_wp** | MySQL -> EC2_wp | Padrão |
-| **EFS_wp** | NFS -> EC2_wp| Padrão |
+| **LB_WP** | HTTP e HTTPS -> Qualquer IPV4 | Qualquer destino |
+| **EC2_WP** | HTTP e HTTPS -> LB_WP <br> SSH -> Qualquer IPV4 (Somente para testes) | Padrão |
+| **RDS_WP** | MySQL -> EC2_WP | Padrão |
+| **EFS_WP** | NFS -> EC2_WP | Padrão |
 
-### **5. Banco de Dados no Relational Database Service (RDS)**
-
-O serviço web WordPress necessita de um banco de dados para armazenar suas informações, logs e se manter de forma estática. Para isso, foi configurado um banco de dados MySQL dentro do **nível gratuito (Free Tier)** do RDS.
-
-Como serão utilizadas instâncias com **subnets privadas**, foi necessário criar um grupo de subnets contendo apenas as subnets privadas dentro do RDS.
-
-#### **5.1. Criação do Grupo de Sub-redes Privadas**
-
-No serviço RDS:
-
-- Acesse **Subnet Groups** e clique em **Create DB subnet group**.
-- Preencha os seguintes campos:
-  - **Nome:** `private-subnet-group`
-  - **Descrição:** Grupo com sub-redes privadas da VPC
-  - **VPC:** `wordpress-vpc`
-  - Escolha as duas **Availability Zones** associadas à VPC.
-  - Selecione as **subnets privadas**.
-- Clique em **Criar** para finalizar.
-
-#### **5.2. Configuração do Banco de Dados RDS**
+### **5. Configuração do Banco de Dados no Relational Database Service (RDS)**
 
 | Configuração | Valor |
 |-------------|-------|
@@ -72,78 +53,79 @@ No serviço RDS:
 | Instância | `db.t3.micro` |
 | Dimensionamento automático de armazenamento | Desativado |
 
+#### **5.1. Configuração do Acesso**
 - **VPC:** `wordpress-vpc`
-- **Grupo de sub-rede do BD:** `private-subnet-group` 
+- **Grupo de sub-rede do BD:** `private-subnet-group`
 - **Acesso público:** Não
 - **Grupo de Segurança:** `SG-RDS`
 
-#### **Configurações Adicionais**
+### **6. Configuração do EFS (Elastic File System)**
 
-- **Nome inicial do banco de dados:** `wordpress`
-- **Backup automático:** Desativado
-- **Criptografia:** Desativada
+Crie um **EFS** para armazenar arquivos compartilhados entre instâncias.
 
-### **6. EFS (Elastic File System)**
+- Monte o EFS na EC2 privada para armazenar uploads do WordPress.
 
-Criamos um **EFS** para armazenar arquivos compartilhados entre instâncias.
 
-- Montado na EC2 privada para armazenar uploads do WordPress
 
-### **7. EC2 Pública (Bastion Host)**
+### **7. Configuração das Instâncias EC2**
 
-Criamos uma instância EC2 pública que serve como Bastion Host para acessar a EC2 privada.
+O projeto requer duas instâncias EC2:
+1. **Instância pública** (Bastion Host) para acessar a instância privada.
+2. **Instância privada** para rodar o WordPress.
 
-- AMI: Ubuntu
-- Tipo da instância: `t3.micro`
-- Conectividade: SSH (porta 22)
+| Configuração | Instância Pública (Bastion) | Instância Privada (WordPress) |
+|-------------|------------------------|--------------------------|
+| AMI | Ubuntu 22.04 | Ubuntu 22.04 |
+| Tipo | `t3.micro` | `t3.micro` |
+| Subnet | Pública | Privada |
+| VPC | `wordpress-vpc` | `wordpress-vpc` |
+| Security Group | `EC2_WP` | `EC2_WP` |
+| Conectividade | SSH (porta 22) | Apenas via Bastion Host |
 
-### **8. EC2 Privada (WordPress com Docker)**
-
-Criamos uma instância privada para hospedar o WordPress usando Docker.
-
-- AMI: Ubuntu
-- Tipo da instância: `t3.micro`
-- **Script de inicialização**:
-  - Instala Docker e Docker Compose
-  - Baixa e inicia contêiner do WordPress e MySQL
-  - Configura conexão com o banco de dados RDS e monta o EFS
-
-### **9. Classic Load Balancer (CLB)**
-
-Criamos um **CLB** para distribuir tráfego para a EC2 privada.
-
-- Listeners: HTTP (porta 80)
-- Health Checks configurados para monitorar a instância
-
-## Como Utilizar
-
-### **Passo 1: Criar os Recursos AWS**
-
-Os recursos podem ser criados manualmente ou via Terraform/CloudFormation.
-
-### **Passo 2: Conectar no Bastion Host**
+#### **5.1. Criar a Instância Privada**
+Você deve configurar a instância privada para rodar o WordPress:
+- Escolha a **AMI Ubuntu 22.04**.
+- Selecione a **subnet privada** dentro da VPC `wordpress-vpc`.
+- Associe o **grupo de segurança EC2_WP**.
+- Script no **User Data**
 
 ```sh
-ssh -i chave.pem ec2-user@IP-BASTION
+# Cole aqui o script de inicialização
 ```
 
-### **Passo 3: Conectar na EC2 Privada**
+#### **5.2. Criar a Instância Pública (Bastion Host)**
+O Bastion Host serve para acessar a instância privada.
+- Escolha a **Ubuntu**.
+- Selecione a **subnet pública** dentro da VPC `wordpress-vpc`.
+- Associe o **grupo de segurança EC2_WP**.
 
-A partir do Bastion Host:
+#### **5.3. Acessar a Instância Privada via Bastion Host**
+Para acessar a instância privada, siga os passos:
 
+1️⃣ **Conecte-se ao Bastion Host**
 ```sh
-ssh -i chave.pem ec2-user@PRIVATE-IP-EC2
+ssh -i chave.pem Ubuntu@IP-BASTION
 ```
 
-### **Passo 4: Verificar o Docker**
+2️⃣ **A partir do Bastion, conecte-se à Instância Privada**
+```sh
+ssh -i chave.pem ubuntu@PRIVATE-IP-EC2
+```
 
+3️⃣ **Verifique se o Docker está rodando**
 ```sh
 docker ps
 ```
 
-### **Passo 5: Acessar o WordPress**
+### **8. Configuração do Classic Load Balancer (CLB)**
 
-Abra o navegador e acesse:
+Crie um **CLB** para distribuir tráfego para a EC2 privada.
+
+- Listeners: HTTP (porta 80)
+- Configure Health Checks para monitorar a instância.
+
+### **9. Testando a Aplicação**
+Após configurar todos os recursos, acesse o WordPress pelo Load Balancer:
 
 ```
 http://DNS-DO-LOAD-BALANCER
