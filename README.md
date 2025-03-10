@@ -1,4 +1,4 @@
-# Documentação do Projeto - Deploy do WordPress na AWS com Docker
+# Documentação do Projeto - WordPress na AWS com Docker
 
 ## Visão Geral
 
