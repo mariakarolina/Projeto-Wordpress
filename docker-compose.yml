@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  wordpress:
+    image: wordpress:latest
+    container_name: wordpress
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      WORDPRESS_DB_HOST: dbwp.c9cweqmayjz8.us-east-1.rds.amazonaws.com
+      WORDPRESS_DB_USER: admin
+      WORDPRESS_DB_PASSWORD: "202019Mara."
+      WORDPRESS_DB_NAME: wordpress
+    volumes:
+      - /mnt/efs/projetopress:/var/www/html
