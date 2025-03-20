@@ -156,18 +156,79 @@ http://DNS-DO-LOAD-BALANCER
 
 ---
 
-## 10. Configuração do Auto Scaling
-No console do EC2, clique em "Launch Configurations".
--  Crie um Launch Configuration usando a mesma AMI e tipo de instância da EC2 privada.
-- Associe o security group `EC2_WP`.
-- Use o mesmo script de User Data da EC2 privada.
+## Configuração do Auto Scaling e CloudWatch 
 
-### **10.1 o console do EC2, clique em "Auto Scaling Groups".**
-- Crie um Auto Scaling Group usando o Launch Configuration criado.
-- Selecione as subnets privadas.
-- Configure o tamanho desejado, mínimo e máximo do grupo.
-- Configure as políticas de escalonamento (por exemplo, com base no uso da CPU).
-- Associe o CLB ao Auto Scaling Group.
+## 1. Criar Alarme no CloudWatch
+
+### 1.1 Acessar o AWS CloudWatch
+1. Vá para o **AWS CloudWatch** e acesse **Alarmes**.
+2. Clique em **Criar Alarme**.
+
+### 1.2 Escolher a métrica
+1. Selecione **EC2 → Auto Scaling → Metrics → CPUUtilization**.
+2. Escolha o grupo **Auto Scaling Group do WordPress**
+
+### 1.3 Configurar os alarmes
+
+#### **Alarme de Scale-Out (Aumento de instância)**
+- **Métrica**: CPUUtilization
+- **Operador**: `> 70%`
+- **Duração**: `60 segundos (teste) ou 300 segundos (produção)`
+- **Ação**: Chamar a política **scaleinpolicy** do Auto Scaling
+
+#### **Alarme de Scale-In (Redução de instância)**
+- **Métrica**: CPUUtilization
+- **Operador**: `< 30%`
+- **Duração**: `300 segundos (recomendado)`
+- **Ação**: Chamar a política **scaleoutpolicy** do Auto Scaling
+
+
+## 2. Configurar o Auto Scaling Group
+
+### 2.1 Criar um Launch Configuration
+1. No console do **EC2**, vá para **Launch Configurations**.
+2. Crie um **Launch Configuration** usando a **mesma AMI e tipo de instância** da EC2 privada.
+3. Associe o **Security Group EC2_WP**.
+4. No **User Data**, insira o mesmo script da EC2 privada.
+
+### 2.2 Criar o Auto Scaling Group
+1. No console do **EC2**, vá para **Auto Scaling Groups**.
+2. Crie um **Auto Scaling Group** usando o Launch Configuration criado.
+3. **Selecione as subnets privadas**.
+4. Configure:
+   - **Tamanho desejado**: `2`
+   - **Mínimo**: `2`
+   - **Máximo**: `4`
+5. Configure as **políticas de escalonamento** baseadas no uso da CPU.
+6. **Associe o Load Balancer (CLB) ao Auto Scaling Group**.
+
+## 3. Criar a Regra no Auto Scaling
+
+### 3.1 Acessar o Auto Scaling Groups
+1. No console do **EC2**, vá para **Auto Scaling Groups**.
+2. Selecione o grupo **AS-wp**.
+3. Vá até a aba **Scaling Policies** e clique em **Criar Política**.
+
+### 3.2 Configurar a Política de Escalonamento
+
+#### **Política de Scale-Out (Adicionar instância)**
+- **Adicionar 1 instância** quando **CPU > 70%**
+- **Cooldown**: `60s (teste) ou 300s (produção)`
+
+#### **Política de Scale-In (Remover instância)**
+- **Remover 1 instância** quando **CPU < 30%**
+- **Cooldown**: `60s (teste) ou 300s (produção)`
+
+4. Associe as políticas aos alarmes criados no CloudWatch.
+
+## Testar e Monitorar
+- Acesse o **CloudWatch Metrics** para verificar a utilização da CPU.
+- No **EC2 → Auto Scaling Groups → Activity History**, veja o histórico de eventos.
+
+---
+
+![image](https://github.com/user-attachments/assets/1f40443f-4c3b-4d8f-8937-5235d6a89d30)
+
 
 
 
