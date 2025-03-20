@@ -23,14 +23,14 @@ sudo ./aws/install
 sudo mkdir -p /mnt/efs
 
 # Configuração do EFS
-EFS_ID="fs-050f37f5cc9058b3d"
+EFS_ID="fs-"
 REGION="us-east-1"
 
 # Montar EFS
-sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 fs-050f37f5cc9058b3d.efs.us-east-1.amazonaws.com:/ /mnt/efs
+sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2 fs.amazonaws.com:/ /mnt/efs
 
 # Persistir montagem no /etc/fstab
-echo "fs-050f37f5cc9058b3d.efs.us-east-1.amazonaws.com:/ /mnt/efs nfs4 defaults,_netdev 0 0" | sudo tee -a /etc/fstab
+echo "fs-" | sudo tee -a /etc/fstab
 
 # Criar diretório do WordPress
 PROJETOPRESS=/mnt/efs/wordpress
@@ -50,9 +50,9 @@ services:
     ports:
       - "80:80"
     environment:
-      WORDPRESS_DB_HOST: "wordpressbd.c9cweqmayjz8.us-east-1.rds.amazonaws.com"
+      WORDPRESS_DB_HOST: ""
       WORDPRESS_DB_USER: "admin"
-      WORDPRESS_DB_PASSWORD: "202019Mara."
+      WORDPRESS_DB_PASSWORD: ""
       WORDPRESS_DB_NAME: "wordpress"
       WORDPRESS_TABLE_PREFIX: "wp_"
       WORDPRESS_DEBUG: "1"
@@ -65,8 +65,8 @@ sudo tee /mnt/efs/wordpress/wp-config.php > /dev/null <<EOL
 <?php
 define('DB_NAME', 'wordpress');
 define('DB_USER', 'admin');
-define('DB_PASSWORD', '202019Mara.');
-define('DB_HOST', 'wordpressbd.c9cweqmayjz8.us-east-1.rds.amazonaws.com');
+define('DB_PASSWORD', '');
+define('DB_HOST', 'rds.amazonaws.com');
 define('DB_CHARSET', 'utf8');
 define('DB_COLLATE', '');
 define('FS_METHOD', 'direct');
