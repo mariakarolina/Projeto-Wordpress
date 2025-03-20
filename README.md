@@ -182,6 +182,28 @@ http://DNS-DO-LOAD-BALANCER
 - **Duração**: `300 segundos (recomendado)`
 - **Ação**: Chamar a política **scaleoutpolicy** do Auto Scaling
 
+#### Criar um Tópico SNS para Notificações
+1. Acesse o **SNS** no console da AWS.
+2. Clique em **Criar tópico** e escolha o tipo de tópico que preferir (ex: padrão).
+3. Configure o nome do tópico e as permissões necessárias.
+4. Clique em **Criar tópico**.
+
+#### Adicionar uma Assinatura ao Tópico SNS
+1. No console do SNS, selecione o tópico que você criou.
+2. Clique em **Criar assinatura**.
+3. Escolha o **protocol** como `Email`.
+4. Insira o **endereço de e-mail** que receberá as notificações.
+5. Clique em **Criar assinatura**.
+6. Verifique seu e-mail e confirme a assinatura.
+
+#### Associar o Tópico SNS aos Alarmes do CloudWatch
+1. No console do **CloudWatch**, acesse **Alarmes**.
+2. Selecione o alarme que você criou (por exemplo, o alarme de Scale-Out ou Scale-In).
+3. Clique em **Editar**.
+4. Na seção **Ações**, marque a opção para **Publicar no tópico SNS**.
+5. Selecione o tópico SNS que você criou anteriormente.
+6. Clique em **Salvar** para aplicar as alterações.
+
 
 ## 2. Configurar o Auto Scaling Group
 
