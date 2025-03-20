@@ -247,6 +247,23 @@ http://DNS-DO-LOAD-BALANCER
 - Acesse o **CloudWatch Metrics** para verificar a utilização da CPU.
 - No **EC2 → Auto Scaling Groups → Activity History**, veja o histórico de eventos.
 
+
+## Criar um Dashboard no CloudWatch
+1. No console do **CloudWatch**, clique em **Dashboards**.
+2. Clique em **Criar dashboard**.
+3. Dê um nome ao seu dashboard e clique em **Criar**.
+4. Adicione widgets ao seu dashboard:
+   - **Métricas de Utilização de CPU**
+   - **Métricas do EFS**: Adicione as métricas relevantes do EFS.
+   - **Métricas do RDS**: Adicione as métricas relevantes do RDS.
+5. Para adicionar alarmes ao dashboard:
+   - Clique em **Adicionar widget**.
+   - Selecione **Alarmes**.
+   - Escolha os alarmes que você deseja monitorar.
+   - Clique em **Adicionar ao dashboard**.
+6. Configure cada widget de acordo com suas preferências de visualização.
+7. Clique em **Salvar dashboard**.
+
 ---
 
 ![image](https://github.com/user-attachments/assets/1f40443f-4c3b-4d8f-8937-5235d6a89d30)
