@@ -277,6 +277,4 @@ http://DNS-DO-LOAD-BALANCER
 
 
 
-![image](https://github.com/user-attachments/assets/690d23c8-16bc-44f4-8bc4-d3fda50e7963)
-
 
