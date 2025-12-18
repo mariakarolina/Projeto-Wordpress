@@ -3,7 +3,7 @@
 Este projeto tem como objetivo implementar um ambiente WordPress na AWS utilizando serviços gerenciados e escaláveis.
 
 
-![image](https://github.com/user-attachments/assets/d50b2031-7a44-40b0-8f97-9efc5beba1b7)
+
 
 
 
